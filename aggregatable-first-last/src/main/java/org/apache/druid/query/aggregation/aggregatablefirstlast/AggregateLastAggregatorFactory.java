@@ -49,17 +49,20 @@ public class AggregateLastAggregatorFactory extends FirstLastAggregatorFactory
   }
 
   @Override
-  public Aggregator factorize(ColumnSelectorFactory columnSelectorFactory)
+  protected FirstLastAggregator buildAggregator(
+      ColumnSelectorFactory columnSelectorFactory
+  )
   {
-    final AggregatorCreator creator = () -> delegate.factorize(columnSelectorFactory);
     return new AggregateLastAggregator(
         columnSelectorFactory.makeColumnValueSelector(ColumnHolder.TIME_COLUMN_NAME),
-        creator
+        () -> delegate.factorize(columnSelectorFactory)
     );
   }
 
   @Override
-  public BufferAggregator factorizeBuffered(ColumnSelectorFactory columnSelectorFactory)
+  protected FirstLastBufferAggregator buildBufferAggregator(
+      ColumnSelectorFactory columnSelectorFactory
+  )
   {
     return new AggregateLastBufferAggregator(
         columnSelectorFactory.makeColumnValueSelector(ColumnHolder.TIME_COLUMN_NAME),
@@ -82,7 +85,24 @@ public class AggregateLastAggregatorFactory extends FirstLastAggregatorFactory
   @Override
   public AggregatorFactory getCombiningFactory()
   {
-    return new AggregateLastAggregatorFactory(delegate, name);
+    return new AggregateLastAggregatorFactory(delegate.getCombiningFactory(), name)
+    {
+      @Override
+      public Aggregator factorize(ColumnSelectorFactory columnSelectorFactory)
+      {
+        return buildAggregator(
+            makeCombiningColumnSelectorFactory(columnSelectorFactory)
+        );
+      }
+
+      @Override
+      public BufferAggregator factorizeBuffered(ColumnSelectorFactory columnSelectorFactory)
+      {
+        return buildBufferAggregator(
+            makeCombiningColumnSelectorFactory(columnSelectorFactory)
+        );
+      }
+    };
   }
 
   @Override

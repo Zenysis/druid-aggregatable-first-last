@@ -26,7 +26,10 @@ import com.google.common.base.Strings;
 import org.apache.druid.collections.SerializablePair;
 import org.apache.druid.java.util.common.UOE;
 import org.apache.druid.query.aggregation.AggregateCombiner;
+import org.apache.druid.query.aggregation.Aggregator;
 import org.apache.druid.query.aggregation.AggregatorFactory;
+import org.apache.druid.query.aggregation.BufferAggregator;
+import org.apache.druid.segment.ColumnSelectorFactory;
 import org.apache.druid.segment.column.ColumnHolder;
 
 import javax.annotation.Nullable;
@@ -53,6 +56,26 @@ public abstract class FirstLastAggregatorFactory extends AggregatorFactory
     this.delegate = delegate;
     this.name = name;
   }
+
+  @Override
+  public Aggregator factorize(ColumnSelectorFactory columnSelectorFactory)
+  {
+    return buildAggregator(columnSelectorFactory);
+  }
+
+  @Override
+  public BufferAggregator factorizeBuffered(ColumnSelectorFactory columnSelectorFactory)
+  {
+    return buildBufferAggregator(columnSelectorFactory);
+  }
+
+  abstract FirstLastAggregator buildAggregator(
+      ColumnSelectorFactory columnSelectorFactory
+  );
+
+  abstract FirstLastBufferAggregator buildBufferAggregator(
+      ColumnSelectorFactory columnSelectorFactory
+  );
 
   @Override
   public boolean canVectorize()
@@ -85,10 +108,33 @@ public abstract class FirstLastAggregatorFactory extends AggregatorFactory
     return combineNonEqual(lhsPair, rhsPair);
   }
 
+  /**
+   * Determine which pair should be used when their timestamps are not equal.
+   * The aggregateFirst will choose the one with a smaller timestamp, while
+   * aggregateLast will choose the larger timestamp.
+   */
   abstract Object combineNonEqual(
       SerializablePair<Long, Object> lhsPair,
       SerializablePair<Long, Object> rhsPair
   );
+
+  /**
+   * Build the ColumnSelectorFactory that needs to be used when aggregating with
+   * the result of `getCombiningFactory`. The results that are streamed through
+   * the combining factory are different than the results streamed through the
+   * normal factory. The column value for this aggregator's `name` will be the
+   * SerializablePair<Long, Object>, and this is what needs to be combined with.
+   */
+  protected ColumnSelectorFactory makeCombiningColumnSelectorFactory(
+      ColumnSelectorFactory originalColumnSelectorFactory
+  )
+  {
+    return new DelegateCombingColumnValueSelectorFactory(
+        originalColumnSelectorFactory,
+        originalColumnSelectorFactory.makeColumnValueSelector(name),
+        delegate.getName()
+    );
+  }
 
   @Override
   public AggregateCombiner makeAggregateCombiner()
@@ -107,6 +153,9 @@ public abstract class FirstLastAggregatorFactory extends AggregatorFactory
   @Nullable
   public Object finalizeComputation(@Nullable Object object)
   {
+    if (object == null) {
+      return null;
+    }
     return delegate.finalizeComputation(((SerializablePair<Long, Object>) object).rhs);
   }
 

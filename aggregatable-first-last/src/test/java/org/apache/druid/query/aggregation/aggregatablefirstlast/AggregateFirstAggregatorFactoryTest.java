@@ -22,10 +22,12 @@ package org.apache.druid.query.aggregation.aggregatablefirstlast;
 import org.apache.druid.collections.SerializablePair;
 import org.apache.druid.common.config.NullHandling;
 import org.apache.druid.query.aggregation.Aggregator;
+import org.apache.druid.query.aggregation.AggregatorFactory;
 import org.apache.druid.query.aggregation.DoubleMaxAggregatorFactory;
 import org.apache.druid.query.aggregation.DoubleSumAggregatorFactory;
 import org.apache.druid.query.aggregation.TestDoubleColumnSelectorImpl;
 import org.apache.druid.query.aggregation.TestLongColumnSelector;
+import org.apache.druid.query.aggregation.TestObjectColumnSelector;
 import org.apache.druid.query.dimension.DimensionSpec;
 import org.apache.druid.segment.ColumnSelectorFactory;
 import org.apache.druid.segment.ColumnValueSelector;
@@ -48,6 +50,15 @@ public class AggregateFirstAggregatorFactoryTest
     agg.aggregate();
     valueSelector.increment();
     timeSelector.increment();
+  }
+
+  private void aggregate(
+      AggregateFirstAggregator agg,
+      TestObjectColumnSelector selector
+  )
+  {
+    agg.aggregate();
+    selector.increment();
   }
 
   private SerializablePair<Long, Double> combine(
@@ -73,7 +84,7 @@ public class AggregateFirstAggregatorFactoryTest
     final TestLongColumnSelector timeSelector = new TestLongColumnSelector(times);
     AggregateFirstAggregatorFactory factory = new AggregateFirstAggregatorFactory(
         new DoubleSumAggregatorFactory("billy", "value"),
-        null
+        "full"
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
@@ -122,7 +133,7 @@ public class AggregateFirstAggregatorFactoryTest
     final TestLongColumnSelector timeSelector = new TestLongColumnSelector(times);
     AggregateFirstAggregatorFactory factory = new AggregateFirstAggregatorFactory(
         new DoubleSumAggregatorFactory("billy", "value"),
-        null
+        "full"
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
@@ -171,7 +182,7 @@ public class AggregateFirstAggregatorFactoryTest
     final TestLongColumnSelector timeSelector = new TestLongColumnSelector(times);
     AggregateFirstAggregatorFactory factory = new AggregateFirstAggregatorFactory(
         new DoubleSumAggregatorFactory("billy", "value"),
-        null
+        "full"
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
@@ -214,6 +225,31 @@ public class AggregateFirstAggregatorFactoryTest
   }
 
   @Test
+  public void testCombiningFactoryDoubleSumDifferentTime()
+  {
+    final SerializablePair[] pairs = {
+        new SerializablePair<>(4567L, 0.15d),
+        new SerializablePair<>(5678L, 0.27d),
+        new SerializablePair<>(6789L, 0.48d)
+    };
+    final TestObjectColumnSelector selector = new TestObjectColumnSelector<>(pairs);
+    AggregateFirstAggregatorFactory factory = new AggregateFirstAggregatorFactory(
+        new DoubleSumAggregatorFactory("billy", "value"),
+        "full"
+    );
+    AggregatorFactory combiningFactory = factory.getCombiningFactory();
+    AggregateFirstAggregator agg = (AggregateFirstAggregator) combiningFactory.factorize(
+        makeCombiningColumnSelector(selector)
+    );
+    aggregate(agg, selector);
+    assertCombined(getPair(agg), 4567L, 0.15d);
+    aggregate(agg, selector);
+    assertCombined(getPair(agg), 4567L, 0.15d);
+    aggregate(agg, selector);
+    assertCombined(getPair(agg), 4567L, 0.15d);
+  }
+
+  @Test
   public void testCombineDoubleMaxSameTime()
   {
     final double[] values = {0.15d, 0.48d, 0.27d};
@@ -222,7 +258,7 @@ public class AggregateFirstAggregatorFactoryTest
     final TestLongColumnSelector timeSelector = new TestLongColumnSelector(times);
     AggregateFirstAggregatorFactory factory = new AggregateFirstAggregatorFactory(
         new DoubleMaxAggregatorFactory("billy", "value"),
-        null
+        "full"
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
@@ -271,7 +307,7 @@ public class AggregateFirstAggregatorFactoryTest
     final TestLongColumnSelector timeSelector = new TestLongColumnSelector(times);
     AggregateFirstAggregatorFactory factory = new AggregateFirstAggregatorFactory(
         new DoubleMaxAggregatorFactory("billy", "value"),
-        null
+        "full"
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
@@ -320,7 +356,7 @@ public class AggregateFirstAggregatorFactoryTest
     final TestLongColumnSelector timeSelector = new TestLongColumnSelector(times);
     AggregateFirstAggregatorFactory factory = new AggregateFirstAggregatorFactory(
         new DoubleMaxAggregatorFactory("billy", "value"),
-        null
+        "full"
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
@@ -444,6 +480,35 @@ public class AggregateFirstAggregatorFactoryTest
           caps.setHasBitmapIndexes(true);
         }
         return caps;
+      }
+    };
+  }
+
+  private ColumnSelectorFactory makeCombiningColumnSelector(
+      final TestObjectColumnSelector<SerializablePair<Long, Double>> valueSelector
+  )
+  {
+    return new ColumnSelectorFactory()
+    {
+      @Override
+      public DimensionSelector makeDimensionSelector(DimensionSpec dimensionSpec)
+      {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public ColumnValueSelector<?> makeColumnValueSelector(String columnName)
+      {
+        if ("full".equals(columnName)) {
+          return valueSelector;
+        }
+        throw new UnsupportedOperationException(columnName);
+      }
+
+      @Override
+      public ColumnCapabilities getColumnCapabilities(String columnName)
+      {
+        return new ColumnCapabilitiesImpl();
       }
     };
   }
