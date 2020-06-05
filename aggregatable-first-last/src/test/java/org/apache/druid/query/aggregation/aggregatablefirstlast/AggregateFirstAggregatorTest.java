@@ -33,10 +33,11 @@ import org.apache.druid.segment.column.ColumnCapabilities;
 import org.apache.druid.segment.column.ColumnCapabilitiesImpl;
 import org.apache.druid.segment.column.ColumnHolder;
 import org.apache.druid.segment.column.ValueType;
+import org.apache.druid.testing.InitializedNullHandlingTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AggregateFirstAggregatorTest
+public class AggregateFirstAggregatorTest extends InitializedNullHandlingTest
 {
   private void aggregate(
       AggregateFirstAggregator agg,
