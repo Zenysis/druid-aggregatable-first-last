@@ -33,8 +33,8 @@ public abstract class FirstLastBufferAggregator implements BufferAggregator
   static final int VALUE_OFFSET = Long.BYTES;
 
   public FirstLastBufferAggregator(
-      BaseLongColumnValueSelector timeSelector,
-      BufferAggregator delegate
+      final BaseLongColumnValueSelector timeSelector,
+      final BufferAggregator delegate
   )
   {
     this.timeSelector = timeSelector;

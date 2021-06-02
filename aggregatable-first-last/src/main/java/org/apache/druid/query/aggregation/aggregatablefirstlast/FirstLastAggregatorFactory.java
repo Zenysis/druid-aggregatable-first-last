@@ -29,8 +29,10 @@ import org.apache.druid.query.aggregation.AggregateCombiner;
 import org.apache.druid.query.aggregation.Aggregator;
 import org.apache.druid.query.aggregation.AggregatorFactory;
 import org.apache.druid.query.aggregation.BufferAggregator;
+import org.apache.druid.segment.ColumnInspector;
 import org.apache.druid.segment.ColumnSelectorFactory;
 import org.apache.druid.segment.column.ColumnHolder;
+import org.apache.druid.segment.column.ValueType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -78,9 +80,12 @@ public abstract class FirstLastAggregatorFactory extends AggregatorFactory
   );
 
   @Override
-  public boolean canVectorize()
+  public boolean canVectorize(ColumnInspector columnInspector)
   {
-    return delegate.canVectorize();
+    // Cannot vectorize this operation right now. If the doublefirst/doublelast
+    // aggregators get updated to show how this can be done, then we can
+    // implement a similar strategy here too.
+    return false;
   }
 
   @Override
@@ -187,9 +192,21 @@ public abstract class FirstLastAggregatorFactory extends AggregatorFactory
   }
 
   @Override
-  public String getTypeName()
+  public String getComplexTypeName()
   {
-    return delegate.getTypeName();
+    return delegate.getComplexTypeName();
+  }
+
+  @Override
+  public ValueType getType()
+  {
+    return delegate.getType();
+  }
+
+  @Override
+  public ValueType getFinalizedType()
+  {
+    return delegate.getFinalizedType();
   }
 
   @Override

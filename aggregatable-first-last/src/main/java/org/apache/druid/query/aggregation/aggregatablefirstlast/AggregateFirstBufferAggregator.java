@@ -27,8 +27,8 @@ import java.nio.ByteBuffer;
 public class AggregateFirstBufferAggregator extends FirstLastBufferAggregator
 {
   public AggregateFirstBufferAggregator(
-      BaseLongColumnValueSelector timeSelector,
-      BufferAggregator delegate
+      final BaseLongColumnValueSelector timeSelector,
+      final BufferAggregator delegate
   )
   {
     super(timeSelector, delegate);
@@ -41,7 +41,7 @@ public class AggregateFirstBufferAggregator extends FirstLastBufferAggregator
   }
 
   @Override
-  public void aggregate(ByteBuffer buf, int position)
+  public void aggregate(final ByteBuffer buf, final int position)
   {
     long time = timeSelector.getLong();
     long firstTime = buf.getLong(position);

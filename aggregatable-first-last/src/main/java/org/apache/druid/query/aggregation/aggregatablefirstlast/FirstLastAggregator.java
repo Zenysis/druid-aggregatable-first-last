@@ -33,7 +33,10 @@ public abstract class FirstLastAggregator implements Aggregator
 
   Aggregator aggregator;
 
-  public FirstLastAggregator(BaseLongColumnValueSelector timeSelector, AggregatorCreator aggregatorCreator)
+  public FirstLastAggregator(
+      final BaseLongColumnValueSelector timeSelector,
+      final AggregatorCreator aggregatorCreator
+  )
   {
     this.timeSelector = timeSelector;
     this.aggregatorCreator = aggregatorCreator;

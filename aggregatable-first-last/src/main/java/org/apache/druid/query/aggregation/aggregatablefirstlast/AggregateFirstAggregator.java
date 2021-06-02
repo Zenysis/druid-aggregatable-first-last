@@ -26,7 +26,10 @@ public class AggregateFirstAggregator extends FirstLastAggregator
 {
   long firstTime;
 
-  public AggregateFirstAggregator(BaseLongColumnValueSelector timeSelector, AggregatorCreator aggregatorCreator)
+  public AggregateFirstAggregator(
+      final BaseLongColumnValueSelector timeSelector,
+      final AggregatorCreator aggregatorCreator
+  )
   {
     super(timeSelector, aggregatorCreator);
     firstTime = Long.MAX_VALUE;
