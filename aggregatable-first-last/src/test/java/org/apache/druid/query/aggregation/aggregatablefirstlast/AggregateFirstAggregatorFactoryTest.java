@@ -35,7 +35,7 @@ import org.apache.druid.segment.DimensionSelector;
 import org.apache.druid.segment.column.ColumnCapabilities;
 import org.apache.druid.segment.column.ColumnCapabilitiesImpl;
 import org.apache.druid.segment.column.ColumnHolder;
-import org.apache.druid.segment.column.ValueType;
+import org.apache.druid.segment.column.ColumnType;
 import org.apache.druid.testing.InitializedNullHandlingTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -89,7 +89,7 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
-        ValueType.DOUBLE,
+        ColumnType.DOUBLE,
         timeSelector
     );
     AggregateFirstAggregator agg1 = (AggregateFirstAggregator) factory.factorize(
@@ -138,7 +138,7 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
-        ValueType.DOUBLE,
+        ColumnType.DOUBLE,
         timeSelector
     );
     AggregateFirstAggregator agg1 = (AggregateFirstAggregator) factory.factorize(
@@ -187,7 +187,7 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
-        ValueType.DOUBLE,
+        ColumnType.DOUBLE,
         timeSelector
     );
     AggregateFirstAggregator agg1 = (AggregateFirstAggregator) factory.factorize(
@@ -263,7 +263,7 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
-        ValueType.DOUBLE,
+        ColumnType.DOUBLE,
         timeSelector
     );
     AggregateFirstAggregator agg1 = (AggregateFirstAggregator) factory.factorize(
@@ -312,7 +312,7 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
-        ValueType.DOUBLE,
+        ColumnType.DOUBLE,
         timeSelector
     );
     AggregateFirstAggregator agg1 = (AggregateFirstAggregator) factory.factorize(
@@ -361,7 +361,7 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
     );
     ColumnSelectorFactory columnSelector = makeColumnSelector(
         valueSelector,
-        ValueType.DOUBLE,
+        ColumnType.DOUBLE,
         timeSelector
     );
     AggregateFirstAggregator agg1 = (AggregateFirstAggregator) factory.factorize(
@@ -436,7 +436,7 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
 
   private ColumnSelectorFactory makeColumnSelector(
       final ColumnValueSelector<?> valueSelector,
-      final ValueType valueType,
+      final ColumnType columnType,
       final TestLongColumnSelector timeSelector
   )
   {
@@ -466,17 +466,17 @@ public class AggregateFirstAggregatorFactoryTest extends InitializedNullHandling
         ColumnCapabilitiesImpl caps;
         if ("value".equals(columnName)) {
           caps = new ColumnCapabilitiesImpl();
-          caps.setType(valueType);
+          caps.setType(columnType);
           caps.setDictionaryEncoded(false);
           caps.setHasBitmapIndexes(false);
         } else if (columnName.equals(ColumnHolder.TIME_COLUMN_NAME)) {
           caps = new ColumnCapabilitiesImpl();
-          caps.setType(ValueType.LONG);
+          caps.setType(ColumnType.LONG);
           caps.setDictionaryEncoded(false);
           caps.setHasBitmapIndexes(false);
         } else {
           caps = new ColumnCapabilitiesImpl();
-          caps.setType(ValueType.STRING);
+          caps.setType(ColumnType.STRING);
           caps.setDictionaryEncoded(true);
           caps.setHasBitmapIndexes(true);
         }
