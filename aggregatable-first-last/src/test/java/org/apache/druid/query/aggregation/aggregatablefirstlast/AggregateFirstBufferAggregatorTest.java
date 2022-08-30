@@ -33,7 +33,7 @@ import org.apache.druid.segment.DimensionSelector;
 import org.apache.druid.segment.column.ColumnCapabilities;
 import org.apache.druid.segment.column.ColumnCapabilitiesImpl;
 import org.apache.druid.segment.column.ColumnHolder;
-import org.apache.druid.segment.column.ValueType;
+import org.apache.druid.segment.column.ColumnType;
 import org.apache.druid.testing.InitializedNullHandlingTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,7 +76,7 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
         null
     );
     BufferAggregator agg = factory.factorizeBuffered(
-        makeColumnSelector(valueSelector, ValueType.DOUBLE, timeSelector)
+        makeColumnSelector(valueSelector, ColumnType.DOUBLE, timeSelector)
     );
     ByteBuffer buffer = ByteBuffer.wrap(new byte[factory.getMaxIntermediateSizeWithNulls()]);
     agg.init(buffer, 0);
@@ -109,7 +109,7 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
         null
     );
     BufferAggregator agg = factory.factorizeBuffered(
-        makeColumnSelector(valueSelector, ValueType.DOUBLE, timeSelector)
+        makeColumnSelector(valueSelector, ColumnType.DOUBLE, timeSelector)
     );
     ByteBuffer buffer = ByteBuffer.wrap(new byte[factory.getMaxIntermediateSizeWithNulls()]);
     agg.init(buffer, 0);
@@ -142,7 +142,7 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
         null
     );
     BufferAggregator agg = factory.factorizeBuffered(
-        makeColumnSelector(valueSelector, ValueType.DOUBLE, timeSelector)
+        makeColumnSelector(valueSelector, ColumnType.DOUBLE, timeSelector)
     );
     ByteBuffer buffer = ByteBuffer.wrap(new byte[factory.getMaxIntermediateSizeWithNulls()]);
     agg.init(buffer, 0);
@@ -177,7 +177,7 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
         null
     );
     BufferAggregator agg = factory.factorizeBuffered(
-        makeColumnSelector(valueSelector, ValueType.DOUBLE, timeSelector)
+        makeColumnSelector(valueSelector, ColumnType.DOUBLE, timeSelector)
     );
     ByteBuffer buffer = ByteBuffer.wrap(new byte[factory.getMaxIntermediateSizeWithNulls()]);
     agg.init(buffer, 0);
@@ -210,7 +210,7 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
         null
     );
     BufferAggregator agg = factory.factorizeBuffered(
-        makeColumnSelector(valueSelector, ValueType.DOUBLE, timeSelector)
+        makeColumnSelector(valueSelector, ColumnType.DOUBLE, timeSelector)
     );
     ByteBuffer buffer = ByteBuffer.wrap(new byte[factory.getMaxIntermediateSizeWithNulls()]);
     agg.init(buffer, 0);
@@ -243,7 +243,7 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
         null
     );
     BufferAggregator agg = factory.factorizeBuffered(
-        makeColumnSelector(valueSelector, ValueType.DOUBLE, timeSelector)
+        makeColumnSelector(valueSelector, ColumnType.DOUBLE, timeSelector)
     );
     ByteBuffer buffer = ByteBuffer.wrap(new byte[factory.getMaxIntermediateSizeWithNulls()]);
     agg.init(buffer, 0);
@@ -300,7 +300,7 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
 
   private ColumnSelectorFactory makeColumnSelector(
       final ColumnValueSelector<?> valueSelector,
-      final ValueType valueType,
+      final ColumnType columnType,
       final TestLongColumnSelector timeSelector
   )
   {
@@ -330,17 +330,17 @@ public class AggregateFirstBufferAggregatorTest extends InitializedNullHandlingT
         ColumnCapabilitiesImpl caps;
         if ("value".equals(columnName)) {
           caps = new ColumnCapabilitiesImpl();
-          caps.setType(valueType);
+          caps.setType(columnType);
           caps.setDictionaryEncoded(false);
           caps.setHasBitmapIndexes(false);
         } else if (columnName.equals(ColumnHolder.TIME_COLUMN_NAME)) {
           caps = new ColumnCapabilitiesImpl();
-          caps.setType(ValueType.LONG);
+          caps.setType(ColumnType.LONG);
           caps.setDictionaryEncoded(false);
           caps.setHasBitmapIndexes(false);
         } else {
           caps = new ColumnCapabilitiesImpl();
-          caps.setType(ValueType.STRING);
+          caps.setType(ColumnType.STRING);
           caps.setDictionaryEncoded(true);
           caps.setHasBitmapIndexes(true);
         }
