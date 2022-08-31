@@ -32,6 +32,7 @@ import org.apache.druid.query.aggregation.BufferAggregator;
 import org.apache.druid.segment.ColumnInspector;
 import org.apache.druid.segment.ColumnSelectorFactory;
 import org.apache.druid.segment.column.ColumnHolder;
+import org.apache.druid.segment.column.ColumnType;
 import org.apache.druid.segment.column.ValueType;
 
 import javax.annotation.Nullable;
@@ -200,13 +201,25 @@ public abstract class FirstLastAggregatorFactory extends AggregatorFactory
   @Override
   public ValueType getType()
   {
-    return delegate.getType();
+    return null;
   }
 
   @Override
   public ValueType getFinalizedType()
   {
-    return delegate.getFinalizedType();
+    return null;
+  }
+
+  @Override
+  public ColumnType getIntermediateType()
+  {
+    return delegate.getIntermediateType();
+  }
+
+  @Override
+  public ColumnType getResultType()
+  {
+    return delegate.getResultType();
   }
 
   @Override
