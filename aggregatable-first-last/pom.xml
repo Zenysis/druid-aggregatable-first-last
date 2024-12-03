@@ -5,7 +5,7 @@
   <parent>
     <artifactId>druid</artifactId>
     <groupId>org.apache.druid</groupId>
-    <version>24.0.0</version>
+    <version>29.0.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -16,12 +16,6 @@
   <description>Perform an aggregation when multiple first/last values have the same timestamp.</description>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.druid</groupId>
-      <artifactId>druid-core</artifactId>
-      <version>${project.parent.version}</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.apache.druid</groupId>
       <artifactId>druid-server</artifactId>
@@ -45,11 +39,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.apache.druid</groupId>
-        <artifactId>druid-core</artifactId>
-        <version>${project.parent.version}</version>
-        <scope>test</scope>
-        <type>test-jar</type>
+      <groupId>org.apache.druid.extensions</groupId>
+      <artifactId>druid-testing-tools</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
